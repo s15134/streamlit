@@ -4,9 +4,10 @@ import time
 import matplotlib as plt
 import os
 import time
+from transformers import pipeline
 # zaczynamy od zaimportowania bibliotek
 
-st.success('Gratulacje! Z powodzeniem uruchomiłeś aplikację')
+# st.success('Gratulacje! Z powodzeniem uruchomiłeś aplikację')
 # streamlit jest wykorzystywany do tworzenia aplikacji
 # z tego powodu dobrą praktyką jest informowanie użytkownika o postępie, błędach, etc.
 
@@ -17,17 +18,18 @@ st.success('Gratulacje! Z powodzeniem uruchomiłeś aplikację')
 # st.info('Informacja...')
 # st.success('Udało się!')
 
-st.spinner()
-# with st.spinner(text='Pracuję... 👀'):
-    # time.sleep(2)
-    # st.success('Done 🎉')
+def load_csv():
+    df = pd.read_csv("cwiczenie_1.csv", sep = ';')
+    return st.dataframe(df)
+
+
 # możemy dzięki temu "ukryć" późniejsze ładowanie aplikacji
 
 st.title('Aplikacja tłumacząca tekst 🐱‍🐉')
 # st.balloons()
 # title, jak sama nazwa wskazuje, używamy do wyświetlenia tytułu naszej aplikacji
 
-st.header('Wprowadzenie do zajęć')
+# st.header('Wprowadzenie do zajęć')
 # header to jeden z podtytułów wykorzystywnaych w Streamlit
 
 #st.subheader('O Streamlit')
@@ -35,6 +37,11 @@ st.header('Wprowadzenie do zajęć')
 
 #st.text('To przykładowa aplikacja z wykorzystaniem Streamlit')
 # text używamy do wyświetlenia dowolnego tekstu. Można korzystać z polskich znaków.
+# st.spinner()
+# with st.spinner(text='Pracuję... 👀'):
+#     time.sleep(2)
+#     # st.success('Done 🎉')
+#     load_csv()
 
 st.write('Streamlit jest biblioteką pozwalającą na uruchomienie modeli uczenia maszynowego.')
 st.write('W aplikacji możesz wpisać tekst po angielsku i sprawdzić wydzwięk tekstu oraz przetłumaczyć tekst na niemiecki')
@@ -47,9 +54,7 @@ st.write('W aplikacji możesz wpisać tekst po angielsku i sprawdzić wydzwięk 
 #    st.write("Echo")
 # możemy też to zrobić prościej używając echo - pokazujemy kod i równocześnie go wykonujemy
 
-def load_csv():
-    df = pd.read_csv("cwiczenie_1.csv", sep = ';')
-    return st.dataframe(df)
+
 
 
 # musimy tylko pamiętać o właściwym określeniu separatora (w tym wypadku to średnik)
@@ -58,32 +63,36 @@ def load_csv():
 # os.chdir("") # zmiana katalogu
 
 st.header('Przetwarzanie języka naturalnego')
+st.write('Wybierz z dostępnych opcji to czego potrzebujesz i wpisz tekst')
 
-import streamlit as st
-from transformers import pipeline
-
-option = st.selectbox(
+def tlumacz_tekstu():
+    option = st.selectbox(
     "Opcje",
     [
         "Wydźwięk emocjonalny tekstu (eng)",
-        "Tłumacz na niemiecki z angielskiego",
+        "Tłumacz z angielskiego na niemiecki",
     ],
 )
-st.spinner(text='Pracuję... 👀')
-if option == "Wydźwięk emocjonalny tekstu (eng)":
-    text = st.text_area(label="Wpisz tekst")
-    if text:
-        classifier = pipeline("sentiment-analysis")
-        answer = classifier(text)
-        st.write(answer)
-    st.success('Done 🎉')
-elif option == "Tłumacz na niemiecki z angielskiego":
-    text = st.text_area(label="Wpisz tekst")
-    if text:
-        classifier = pipeline("translation_en_to_de")
-        answer = classifier(text)
-        st.write(answer)
-    st.success('Done 🎉')
+    if option == "Wydźwięk emocjonalny tekstu (eng)":
+        text = st.text_area(label="Wpisz tekst")
+        if text:
+            classifier = pipeline("sentiment-analysis")
+            answer = classifier(text)
+            st.write(answer)
+    elif option == "Tłumacz z angielskiego na niemiecki":
+        text = st.text_area(label="Wpisz tekst")
+        if text:
+            classifier = pipeline("translation_en_to_de")
+            answer = classifier(text)
+            st.write(answer)
+
+with st.spinner(text='Pracuję... 👀'):
+    time.sleep(6)
+    tlumacz_tekstu()
+    st.balloons()
+    
+
+
 
 st.subheader('Zadanie do wykonania')
 st.write('Wykorzystaj Huggin Face do stworzenia swojej własnej aplikacji tłumaczącej tekst z języka angielskiego na język niemiecki. Zmodyfikuj powyższy kod dodając do niego kolejną opcję, tj. tłumaczenie tekstu. Informacje potrzebne do zmodyfikowania kodu znajdziesz na stronie Huggin Face - https://huggingface.co/transformers/usage.html')
